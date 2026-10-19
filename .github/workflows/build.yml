@@ -1,40 +1,9 @@
 
-name: Build Runner PSP
-
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Baixar projeto
-        uses: actions/checkout@v4
-
-      - name: Preparar compilador PSP
-        run: |
-          docker pull pspdev/pspdev:latest
-
       - name: Compilar jogo
         run: |
           docker run --rm \
+            -e PSPSDK=/opt/pspdev/psp \
             -v "$GITHUB_WORKSPACE:/src" \
             -w /src \
             pspdev/pspdev:latest \
             make clean all
-
-      - name: Conferir EBOOT.PBP
-        run: |
-          ls -la
-          test -s EBOOT.PBP
-
-      - name: Disponibilizar jogo para download
-        uses: actions/upload-artifact@v4
-        with:
-          name: Runner-PSP
-          path: EBOOT.PBP
-          if-no-files-found: error
