@@ -12,23 +12,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Baixar os arquivos do projeto
+      - name: Baixar projeto
         uses: actions/checkout@v4
 
-      - name: Compilar para PSP
+      - name: Preparar compilador PSP
+        run: |
+          docker pull pspdev/pspdev:latest
+
+      - name: Compilar jogo
         run: |
           docker run --rm \
             -v "$GITHUB_WORKSPACE:/src" \
             -w /src \
             pspdev/pspdev:latest \
-            make
+            make clean all
 
-      - name: Conferir o executável
+      - name: Conferir EBOOT.PBP
         run: |
+          ls -la
           test -s EBOOT.PBP
-          ls -lh EBOOT.PBP
 
-      - name: Disponibilizar o EBOOT.PBP
+      - name: Disponibilizar jogo para download
         uses: actions/upload-artifact@v4
         with:
           name: Runner-PSP
